@@ -5,7 +5,7 @@ work_dir=$PWD
 rootfs="rootfs"
 rootfs_img=$PWD"/rootfs_img"
 
-make LLVM=1
+#make LLVM=1
 echo $base_path
 if [ ! -d $rootfs ]; then
     mkdir $rootfs

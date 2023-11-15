@@ -18,6 +18,7 @@
  * accidentally exposed.
  */
 
+#include "linux/export.h"
 #include <linux/amba/bus.h>
 #include <linux/bug.h>
 #include <linux/build_bug.h>
@@ -803,6 +804,11 @@ void rust_helper_ndelay(unsigned long nsecs) {
 	ndelay(nsecs);
 }
 EXPORT_SYMBOL_GPL(rust_helper_ndelay);
+
+void rust_helper_netif_tx_disable(struct net_device *dev) {
+	netif_tx_disable(dev);
+}
+EXPORT_SYMBOL_GPL(rust_helper_netif_tx_disable);
 
 /*
  * We use `bindgen`'s `--size_t-is-usize` option to bind the C `size_t` type

@@ -103,6 +103,7 @@ impl<T: DriverOps> Drop for Registration<T> {
         if self.is_registered {
             // SAFETY: This path only runs if a previous call to `T::register` completed
             // successfully.
+            crate::pr_info!("driver::Registration<T>::drop()\n");
             unsafe { T::unregister(self.concrete_reg.get()) };
         }
     }

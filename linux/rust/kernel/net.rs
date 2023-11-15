@@ -13,7 +13,7 @@ use crate::{
     sync::UniqueArc,
     to_result,
     types::PointerWrapper,
-    ARef, AlwaysRefCounted, Error, Result,
+    ARef, AlwaysRefCounted, Error, Result, pr_info,
 };
 use core::{
     cell::UnsafeCell,
@@ -70,6 +70,11 @@ impl Device {
     pub fn eth_hw_addr_set(&self, addr: &[u8; 6]) {
         // SAFETY: The netdev is valid because the shared reference guarantees a nonzero refcount.
         unsafe { bindings::eth_hw_addr_set(self.0.get(), addr as _) }
+    }
+
+    /// Disable TX of net interface, equivalent to syscall `netif_tx_disable()`. 
+    pub fn netif_tx_disable(&self) {
+        unsafe { bindings::netif_tx_disable(self.0.get()) }
     }
 
     /// Returns the mtu of the device.
@@ -202,6 +207,7 @@ impl<T: DeviceOperations> Registration<T> {
 impl<T: DeviceOperations> Drop for Registration<T> {
     fn drop(&mut self) {
         // SAFETY: `dev` was allocated during initialization and guaranteed to be valid.
+        pr_info!("net::Registration<T>::drop()\n");
         unsafe {
             if self.registered {
                 bindings::unregister_netdev(self.dev);
@@ -476,6 +482,13 @@ impl Napi {
         // SAFETY: The existence of a shared reference means `self.0` is valid.
         unsafe {
             bindings::napi_enable(self.0.get());
+        }
+    }
+
+    /// Disable NAPI scheduling.
+    pub fn disable(&self) {
+        unsafe {
+            bindings::napi_disable(self.0.get());
         }
     }
 
